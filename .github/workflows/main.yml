@@ -22,7 +22,18 @@ jobs:
         port: ${{ secrets.PORT }}
         envs: BRANCH,REPO
         script: |
+          cd /home/ec2-user/star_kill/services/planesticud
+          git clone https://github.com/$REPO
           cd /home/ec2-user/star_kill/services/$REPO
+          git checkout $BRANCH
           git pull origin $BRANCH
           docker-compose build
           docker-compose up -d
+    - name: send custom message with args
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: |
+         The ${{ github.repository }} pass action.
+         in branch ${{ steps.extract_branch.outputs.branch }}.
